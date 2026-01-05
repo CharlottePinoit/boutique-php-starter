@@ -10,5 +10,7 @@ echo sprintf("Chaussures %s %s<br>", $brand, $model);
 
 
 $price = 99.99;
-echo "Prix : $price €<br>";  // Que s'affiche-t-il ?
+echo "Prix : $price €<br>";  // Que s'affiche-t-il ? 
+// Double quotes → variable interprétée, s'affiche correctement: Prix : 99.99 €
 echo 'Prix : $price €';  // Et là ?
+// Simple quotes → texte affiché tel quel, pas d'interpolation: Prix : $price €
