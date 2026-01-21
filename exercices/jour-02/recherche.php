@@ -15,7 +15,7 @@ if (in_array("electronique", $categories)) {
     echo "non trouvé :(";
 }
 echo "<br>";
-//trouver l'index d'un élément
+//trouver l'index d'un élément avec array_search
 $indexSport = array_search("Sport", $categories);
 
 if ($indexSport == true) {

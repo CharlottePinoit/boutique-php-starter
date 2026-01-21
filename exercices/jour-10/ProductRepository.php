@@ -94,4 +94,44 @@ class ProductRepository
         $stmt->execute([$categoryId]);
         return array_map([$this, 'hydrate'], $stmt->fetchAll());
     }
+
+    public function findInStock(): array
+    {
+        $stmt = $this->pdo->query(
+            "SELECT * FROM products WHERE stock > 0"
+        );
+
+        return array_map(
+            [$this, 'hydrate'],
+            $stmt->fetchAll()
+        );
+    }
+    public function findByPriceRange(float $min, float $max): array
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT * FROM products WHERE price BETWEEN ? AND ?"
+        );
+
+        $stmt->execute([$min, $max]);
+
+        return array_map(
+            [$this, 'hydrate'],
+            $stmt->fetchAll()
+        );
+    }
+    public function search(string $term): array
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT * FROM products WHERE name LIKE ?"
+        );
+
+        $stmt->execute([
+            '%' . $term . '%'
+        ]);
+
+        return array_map(
+            [$this, 'hydrate'],
+            $stmt->fetchAll()
+        );
+    }
 }

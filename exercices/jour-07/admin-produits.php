@@ -56,7 +56,7 @@ if (isset($_GET["delete"])) {
 }
 
 
-//RÉCUPÉRER UN PRODUIT À MODIFIER (SI BESOIN)
+//RÉCUPÉRER UN PRODUIT À MODIFIER 
 
 $productToEdit = null;
 

@@ -29,7 +29,7 @@ class BankAccount
         return $this->balance;
     }
 }
-
+//affichage
 $account = new BankAccount();
 $account->deposit(100);
 echo "Dépot effectué";

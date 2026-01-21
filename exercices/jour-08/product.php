@@ -7,7 +7,7 @@ class Product
     private string $description;
     private float $price;
     private int $stock;
-    private string $category;
+    private Category $category;
 
     public function __construct(int $id, string $name, string $description, float $price, int $stock, string $category)
     {
@@ -41,6 +41,21 @@ class Product
         if ($percentage <= 0 || $percentage > 100) return false; // si pourcentage négatif ou supérieur à 100, opération invalide
         $this->price *= 1 - $percentage / 100;
         return true;
+    }
+    //utilisation dans l'exo suivant "catalogue.php"
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getStock(): int
+    {
+        return $this->stock;
+    }
+
+    public function getCategory(): string
+    {
+        return $this->category;
     }
 }
 
