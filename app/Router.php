@@ -1,44 +1,45 @@
 <?php
 
+namespace App;
+
 class Router
 {
     private array $routes = [];
 
     public function get(string $pattern, array $action): void
     {
-        $this->addRoute('GET', $pattern, $action);
+        $regex = preg_replace('/\{(\w+)\}/', '(?P<$1>[^/]+)', $pattern);
+        $regex = '#^' . $regex . '$#';
+
+        $this->routes['GET'][$regex] = $action;
     }
 
     public function post(string $pattern, array $action): void
     {
-        $this->addRoute('POST', $pattern, $action);
-    }
-
-    private function addRoute(string $method, string $pattern, array $action): void
-    {
-        // Transforme /produit/{id} en regex
         $regex = preg_replace('/\{(\w+)\}/', '(?P<$1>[^/]+)', $pattern);
         $regex = '#^' . $regex . '$#';
 
-        $this->routes[$method][$regex] = $action;
+        $this->routes['POST'][$regex] = $action;
     }
+
+
 
     public function dispatch(string $uri, string $method): void
     {
         $path = parse_url($uri, PHP_URL_PATH);
 
-        foreach ($this->routes[$method] ?? [] as $regex => $action) {
+        foreach ($this->routes[$method] ?? [] as $regex => $handler) {
 
             if (preg_match($regex, $path, $matches)) {
-
+                [$controller, $action] = $handler;
                 $params = array_filter(
                     $matches,
                     fn($key) => !is_int($key),
                     ARRAY_FILTER_USE_KEY
                 );
 
-                [$controller, $methodName] = $action;
-                (new $controller())->$methodName($params ?? []);
+                $controllerInstance = new $controller();
+                $controllerInstance->$action(...$params);
                 return;
             }
         }

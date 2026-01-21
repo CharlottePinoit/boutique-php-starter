@@ -1,11 +1,13 @@
 <?php
-// app/Controller/HomeController.php
+
+namespace App\Controller;
 
 class HomeController
 {
     public function index(): void
     {
-        $title = "Bienvenue sur ma boutique";
-        require __DIR__ . '/../../views/home/index.php';
+        view('home/index', [
+            'title' => 'Bienvenue sur ma boutique'
+        ]);
     }
 }

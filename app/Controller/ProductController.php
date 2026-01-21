@@ -1,34 +1,53 @@
 <?php
 
+namespace App\Controller;
+
+use App\Repository\ProductRepository;
+use config\Database;
+
 class ProductController
 {
-    public function index(): void
-    {
-        // Exemple simple sans BDD
-        $products = [
-            ['id' => 1, 'name' => 'Produit 1', 'price' => 10],
-            ['id' => 2, 'name' => 'Produit 2', 'price' => 20],
-        ];
+    private ProductRepository $repository;
 
-        require __DIR__ . '/../../views/products/index.php';
+    public function __construct()
+    {
+        $pdo = Database::getInstance();
+        $this->repository = new ProductRepository($pdo);
     }
 
-    public function show(array $params): void
+    public function index(): void
     {
-        $id = (int) ($params['id'] ?? 0);
+        view('products/index', [
+            'title' => 'Nos produits',
+            'products' => $this->repository->findAll()
+        ]);
+    }
 
-        if ($id <= 0) {
+
+
+
+    public function show(string $id): void
+    {
+        /*if (!$id) {
             header('Location: /produits');
+            exit;
+        }*/
+
+        $product = $this->repository->find((int)$id);
+
+        if (!$product) {
+            http_response_code(404);
+            //require __DIR__ . '/../../views/errors/404.php';
+            view('/products/404', [
+                'title' => 'page introuvable',
+            ]);
             exit;
         }
 
-        // Simulation produit
-        $product = [
-            'id' => $id,
-            'name' => 'Produit ' . $id,
-            'price' => 10 * $id
-        ];
-
-        require __DIR__ . '/../../views/products/show.php';
+        //require __DIR__ . '/../../views/products/show.php';
+        view('/products/show', [
+            'title' => e($product->getName()),
+            'product' => $product
+        ]);
     }
 }

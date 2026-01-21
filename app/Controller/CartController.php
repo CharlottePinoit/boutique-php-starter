@@ -1,62 +1,56 @@
 <?php
 
+namespace App\Controller;
+
+use App\Repository\ProductRepository;
+use config\Database;
+
 class CartController
+
 {
-    // GET /panier
+    private ProductRepository $repository;
+
+    public function __construct()
+    {
+        $pdo = Database::getInstance();
+        $this->repository = new ProductRepository($pdo);
+    }
     public function index(): void
     {
-        $cart = $_SESSION['cart'] ?? [];
-        require __DIR__ . '/../../views/cart/index.php';
+
+        view('cart/index', [
+            'title' => 'Mon panier',
+            'products' => $this->repository->findAll()
+        ]);
     }
 
-    // POST /panier/ajouter
     public function add(): void
     {
-        $productId = (int) ($_POST['product_id'] ?? 0);
-        $quantity  = (int) ($_POST['quantity'] ?? 1);
+        $id = $_POST['product_id'] ?? null;
+        $qty = (int) ($_POST['quantity'] ?? 1);
 
-        if ($productId > 0 && $quantity > 0) {
-            if (!isset($_SESSION['cart'][$productId])) {
-                $_SESSION['cart'][$productId] = 0;
-            }
-            $_SESSION['cart'][$productId] += $quantity;
+        if ($id && $qty > 0) {
+            $_SESSION['cart'][$id] = ($_SESSION['cart'][$id] ?? 0) + $qty;
         }
 
-        $this->redirect('/panier');
+        redirect('/panier');
     }
 
-    // POST /panier/supprimer
     public function remove(): void
     {
-        $productId = (int) ($_POST['product_id'] ?? 0);
-
-        if ($productId > 0 && isset($_SESSION['cart'][$productId])) {
-            unset($_SESSION['cart'][$productId]);
+        $id = $_POST['product_id'] ?? null;
+        if ($id) {
+            unset($_SESSION['cart'][$id]);
         }
-
-        $this->redirect('/panier');
+        redirect('/panier');
     }
 
-    // POST /panier/modifier
     public function update(): void
     {
-        foreach ($_POST['quantities'] ?? [] as $productId => $quantity) {
-            $productId = (int) $productId;
-            $quantity  = (int) $quantity;
-
-            if ($quantity > 0) {
-                $_SESSION['cart'][$productId] = $quantity;
-            } else {
-                unset($_SESSION['cart'][$productId]);
-            }
+        foreach ($_POST['quantity'] ?? [] as $id => $qty) {
+            if ($qty > 0) $_SESSION['cart'][$id] = (int)$qty;
+            else unset($_SESSION['cart'][$id]);
         }
-
-        $this->redirect('/panier');
-    }
-
-    private function redirect(string $url): void
-    {
-        header("Location: $url");
-        exit;
+        redirect('/panier');
     }
 }
